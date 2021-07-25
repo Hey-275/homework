@@ -15,23 +15,32 @@ public class main {
             Users.add(new User(i));
         }
 
-        for (int i=0;i<50000;i++){
-            user = Users.get(rand.nextInt(100));
+        Runnable task = () -> {
+            User user1 = Users.get(rand.nextInt(100));
+            ProductS product1 ;
             Integer flag = rand.nextInt(10);
 
             while (true){
-                product = Products.get(flag%10);
-                if (product.getAmount()>0&&user.getIntegral()>product.getCost()){
-                    user.setIntegral(user.getIntegral()-product.getCost());
-                    product.setAmount(product.getAmount()-1);
-                    user.getPurchased().put(product,user.getPurchased().get(product)==null?1:user.getPurchased().get(product)+1);
+
+                product1 = Products.get(flag%10);
+                synchronized (product1){
+
+
+                if (product1.getAmount()>0&&user1.getIntegral()>product1.getCost()){
+                    user1.setIntegral(user1.getIntegral()-product1.getCost());
+                    product1.setAmount(product1.getAmount()-1);
+                    user1.getPurchased().put(product1,user1.getPurchased().get(product1)==null?1:user1.getPurchased().get(product1)+1);
 
                     break;
                 }
                 System.out.println(2);
                 flag+=1;
             }
-
+            }
+        };
+        for (int i=0;i<50000;i++){
+            Thread thread = new Thread(task);
+            thread.start();
         }
         Integer num=0;
         for (int i =0 ;i<100;i++){
@@ -43,12 +52,48 @@ public class main {
         System.out.println(num);
         Integer kk = 0;
         for (int i=0;i<10;i++){
-           // System.out.println(Products.get(i));
+            // System.out.println(Products.get(i));
             System.out.println(Users.get(i));
             kk+=10000-Products.get(i).getAmount();
 
         }
         System.out.println(kk);
+
+//
+//        for (int i=0;i<50000;i++){
+//            user = Users.get(rand.nextInt(100));
+//            Integer flag = rand.nextInt(10);
+//
+//            while (true){
+//                product = Products.get(flag%10);
+//                if (product.getAmount()>0&&user.getIntegral()>product.getCost()){
+//                    user.setIntegral(user.getIntegral()-product.getCost());
+//                    product.setAmount(product.getAmount()-1);
+//                    user.getPurchased().put(product,user.getPurchased().get(product)==null?1:user.getPurchased().get(product)+1);
+//
+//                    break;
+//                }
+//                System.out.println(2);
+//                flag+=1;
+//            }
+//
+//        }
+//        Integer num=0;
+//        for (int i =0 ;i<100;i++){
+//            for (int j=0;j<10;j++){
+//                num+= Users.get(i).getPurchased().get(Products.get(j));
+//                System.out.println(Users.get(i).getPurchased().get(Products.get(j)));
+//            }
+//        }
+//        System.out.println(num);
+//        Integer kk = 0;
+//        for (int i=0;i<10;i++){
+//           // System.out.println(Products.get(i));
+//            System.out.println(Users.get(i));
+//            kk+=10000-Products.get(i).getAmount();
+//
+//        }
+//        System.out.println(kk);
     }
 
     private static ArrayList<ProductS> InitProducts(String[] Describes,Integer[] Cost){
